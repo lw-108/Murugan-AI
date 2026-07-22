@@ -22,7 +22,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@bklitui/ui/charts": ["./src/components/ui/charts.tsx"],
+      "@bklit/pie-chart": ["./src/components/ui/charts.tsx"],
+      "@bklit/bar-chart": ["./src/components/ui/charts.tsx"]
     }
   },
   "include": ["src"]
