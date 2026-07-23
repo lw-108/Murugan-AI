@@ -92,6 +92,17 @@ const topProjects = [
       { label: "MFC", pct: "0%", val: 0, color: "#D97706" },
     ],
   },
+  {
+    name: "Nordic Telecom", sub: "Nordic Systems", rules: "6 Rules",
+    segments: [
+      { label: "Completed", pct: "35%", val: 35, color: "#3AA76D" },
+      { label: "Ongoing", pct: "15%", val: 15, color: "#1D5BD8" },
+      { label: "Failed", pct: "8%", val: 8, color: "#C83D22" },
+      { label: "Yet to start", pct: "32%", val: 32, color: "#E5E7EB" },
+      { label: "TSTL", pct: "5%", val: 5, color: "#A78BFA" },
+      { label: "MFC", pct: "5%", val: 5, color: "#D97706" },
+    ],
+  },
 ];
 
 const recentScans = [
@@ -406,34 +417,34 @@ export function App() {
                           key={idx}
                           className="transition-colors cursor-pointer border-b border-slate-200/40 hover:bg-white/40 group"
                         >
-                          <td className="py-4 pl-4 pr-2">
+                          <td className="py-2 pl-4 pr-2">
                             <input
                               type="checkbox"
                               className="w-4 h-4 rounded accent-[#0052FF] cursor-pointer"
                             />
                           </td>
-                          <td className="py-4 px-4 text-[16px] font-semibold text-slate-800">{row.id}</td>
-                          <td className="py-4 px-4 text-[16px] text-slate-800">{row.project}</td>
-                          <td className="py-4 px-4 text-[16px] text-slate-800">{row.model}</td>
-                          <td className="py-4 px-4 text-[16px] text-slate-800">{row.datetime}</td>
-                          <td className="py-4 px-4">
+                          <td className="py-2 px-4 text-[16px] font-semibold text-slate-800">{row.id}</td>
+                          <td className="py-2 px-4 text-[16px] text-slate-800">{row.project}</td>
+                          <td className="py-2 px-4 text-[16px] text-slate-800">{row.model}</td>
+                          <td className="py-2 px-4 text-[16px] text-slate-800">{row.datetime}</td>
+                          <td className="py-2 px-4">
                             {row.type === "ongoing" && (
-                              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[14px] font-normal bg-[#0052FF]/10 text-black">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px] font-normal bg-[#0052FF]/10 text-black">
                                 Ongoing | {(row as { progress?: string }).progress}
                               </span>
                             )}
                             {row.type === "completed" && (
-                              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[14px] font-normal bg-emerald-100/80 text-black">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px] font-normal bg-emerald-100/80 text-black">
                                 Completed
                               </span>
                             )}
                             {row.type === "stopped" && (
-                              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[14px] font-normal bg-rose-100/80 text-black">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px] font-normal bg-rose-100/80 text-black">
                                 Stopped
                               </span>
                             )}
                           </td>
-                          <td className="py-4 pr-4">
+                          <td className="py-2 pr-4">
                             <MoreHorizontal className="w-5 h-5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-slate-600" />
                           </td>
                         </tr>
@@ -448,10 +459,10 @@ export function App() {
             {/* Right Column: Top 3 Projects (col-span-4) */}
             <div className="col-span-4">
               <div className="bg-white/40 backdrop-blur-xl border border-white/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.04)] rounded-2xl p-6 flex flex-col gap-4">
-                <h3 className="text-[22px] text-slate-800 mb-1">Top 3 Projects</h3>
+                <h3 className="text-[22px] text-slate-800 mb-1">Top 4 Projects</h3>
                 <div className="flex flex-col gap-4">
-                  {topProjects.slice(0, 3).map((proj, pIdx) => (
-                    <div key={pIdx} className="flex flex-col gap-3 pb-5 border-b border-slate-200/50 last:border-0 last:pb-0">
+                  {topProjects.slice(0, 4).map((proj, pIdx) => (
+                    <div key={pIdx} className="flex flex-col gap-3 pb-5 border-b border-slate-300/70 last:border-0 last:pb-0">
                       <div className="flex items-start justify-between">
                         <div>
                           <h4 className="text-[17px] font-medium text-slate-900">{proj.name}</h4>
