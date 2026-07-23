@@ -4,6 +4,7 @@
 //             ChartBrushLayout, ChartTooltip, curveCatmullRom
 
 import React, { createContext, useContext, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 
 // ─── Shared types ────────────────────────────────────────────────────────────
 type DataRecord = Record<string, string | number | Date>;
@@ -40,18 +41,64 @@ function polarToCartesian(cx: number, cy: number, r: number, deg: number) {
 function describeSlice(
   cx: number, cy: number,
   outerR: number, innerR: number,
-  start: number, end: number, gap = 2,
+  start: number, end: number, gap = 4,
+  cornerRadius = 6,
 ) {
-  const s1 = polarToCartesian(cx, cy, outerR, start + gap / 2);
-  const e1 = polarToCartesian(cx, cy, outerR, end   - gap / 2);
-  const s2 = polarToCartesian(cx, cy, innerR, end   - gap / 2);
-  const e2 = polarToCartesian(cx, cy, innerR, start + gap / 2);
-  const large = (end - start - gap) > 180 ? 1 : 0;
-  return `M ${s1.x} ${s1.y} A ${outerR} ${outerR} 0 ${large} 1 ${e1.x} ${e1.y} L ${s2.x} ${s2.y} A ${innerR} ${innerR} 0 ${large} 0 ${e2.x} ${e2.y} Z`;
+  const startDeg = start + gap / 2;
+  const endDeg = end - gap / 2;
+  if (endDeg <= startDeg) return "";
+
+  const thickness = outerR - innerR;
+  const r = Math.min(cornerRadius, thickness / 2);
+
+  // Angular offset produced by the corner rounding arcs
+  const outerAngleOffset = (r / outerR) * (180 / Math.PI);
+  const innerAngleOffset = (r / innerR) * (180 / Math.PI);
+
+  const a1 = startDeg + outerAngleOffset;
+  const a2 = endDeg - outerAngleOffset;
+  const a3 = endDeg - innerAngleOffset;
+  const a4 = startDeg + innerAngleOffset;
+
+  // If the segment is too small for rounded corners, fall back to simple arcs
+  if (a2 <= a1) {
+    const s1 = polarToCartesian(cx, cy, outerR, startDeg);
+    const e1 = polarToCartesian(cx, cy, outerR, endDeg);
+    const s2 = polarToCartesian(cx, cy, innerR, endDeg);
+    const e2 = polarToCartesian(cx, cy, innerR, startDeg);
+    const large = (endDeg - startDeg) > 180 ? 1 : 0;
+    return `M ${s1.x} ${s1.y} A ${outerR} ${outerR} 0 ${large} 1 ${e1.x} ${e1.y} L ${s2.x} ${s2.y} A ${innerR} ${innerR} 0 ${large} 0 ${e2.x} ${e2.y} Z`;
+  }
+
+  // 8 control points for a rounded-corner annular segment:
+  // Outer: p1→(corner arc)→p2→(main arc)→p3→(corner arc)→p4
+  // Inner: p5→(corner arc)→p6→(main arc)→p7→(corner arc)→p8
+  const p1 = polarToCartesian(cx, cy, outerR - r, startDeg);
+  const p2 = polarToCartesian(cx, cy, outerR, a1);
+  const p3 = polarToCartesian(cx, cy, outerR, a2);
+  const p4 = polarToCartesian(cx, cy, outerR - r, endDeg);
+  const p5 = polarToCartesian(cx, cy, innerR + r, endDeg);
+  const p6 = polarToCartesian(cx, cy, innerR, a3);
+  const p7 = polarToCartesian(cx, cy, innerR, a4);
+  const p8 = polarToCartesian(cx, cy, innerR + r, startDeg);
+
+  const sweepOuter = a2 - a1;
+  const sweepInner = a3 - a4;
+  const largeOuter = sweepOuter > 180 ? 1 : 0;
+  const largeInner = sweepInner > 180 ? 1 : 0;
+
+  return `M ${p1.x} ${p1.y} ` +
+    `A ${r} ${r} 0 0 1 ${p2.x} ${p2.y} ` +
+    `A ${outerR} ${outerR} 0 ${largeOuter} 1 ${p3.x} ${p3.y} ` +
+    `A ${r} ${r} 0 0 1 ${p4.x} ${p4.y} ` +
+    `L ${p5.x} ${p5.y} ` +
+    `A ${r} ${r} 0 0 1 ${p6.x} ${p6.y} ` +
+    `A ${innerR} ${innerR} 0 ${largeInner} 0 ${p7.x} ${p7.y} ` +
+    `A ${r} ${r} 0 0 1 ${p8.x} ${p8.y} Z`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PIE CHART
+// PIE / GAUGE CHART
 // ─────────────────────────────────────────────────────────────────────────────
 
 type PieDataItem = { label: string; value: number; color: string };
@@ -64,68 +111,170 @@ type PieChartCtxType = {
   slices: { startAngle: number; endAngle: number; item: PieDataItem }[];
   activeIndex: number | null;
   setActiveIndex: (i: number | null) => void;
+  setMousePos: (pos: { x: number; y: number }) => void;
+  startAngle: number;
+  endAngle: number;
+  isGauge: boolean;
+  cx: number;
+  cy: number;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 };
 
 const PieChartCtx = createContext<PieChartCtxType | null>(null);
 
 export function PieChart({
-  data, size = 280, innerRadius = 0, children,
+  data, size = 280, innerRadius = 0, startAngle = 0, endAngle = 360, children,
 }: {
   data: PieDataItem[];
   size?: number;
   innerRadius?: number;
+  startAngle?: number;
+  endAngle?: number;
   children?: React.ReactNode;
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
   const total = data.reduce((s, d) => s + d.value, 0);
-  let cum = 0;
+  const angleRange = endAngle - startAngle;
+  const isGauge = angleRange < 360;
+
+  let cum = startAngle;
   const slices = data.map(item => {
-    const startAngle = cum;
-    cum += (item.value / total) * 360;
-    return { startAngle, endAngle: cum, item };
+    const sAngle = cum;
+    cum += (item.value / total) * angleRange;
+    return { startAngle: sAngle, endAngle: cum, item };
   });
+
+  // For a gauge arc we need to compute the bounding box of the arc to size the viewBox correctly.
+  const outerR = size / 2 - 4;
+  const cx = size / 2;
+  const cy = size / 2;
+
+  // Compute vertical bounds of the arc for gauge mode
+  let svgHeight = size;
+  let viewBoxY = 0;
+  let viewBoxH = size;
+
+  if (isGauge) {
+    // Find the topmost and bottommost points of the arc
+    const startPt = polarToCartesian(cx, cy, outerR, startAngle);
+    const endPt = polarToCartesian(cx, cy, outerR, endAngle);
+    let minY = Math.min(startPt.y, endPt.y);
+    let maxY = Math.max(startPt.y, endPt.y);
+
+    // Check cardinal directions within the arc sweep
+    for (let cardinal = 0; cardinal <= 360; cardinal += 90) {
+      let deg = cardinal;
+      while (deg < startAngle) deg += 360;
+      if (deg <= endAngle) {
+        const pt = polarToCartesian(cx, cy, outerR, deg);
+        minY = Math.min(minY, pt.y);
+        maxY = Math.max(maxY, pt.y);
+      }
+    }
+
+    const padding = 8;
+    viewBoxY = minY - padding;
+    viewBoxH = maxY - viewBoxY + padding + 40;
+    svgHeight = Math.round(viewBoxH);
+  }
+
+  const viewBox = isGauge
+    ? `0 ${viewBoxY} ${size} ${viewBoxH}`
+    : `0 0 ${size} ${size}`;
+
+  const activeItem = activeIndex !== null ? slices[activeIndex].item : null;
+
   return (
-    <PieChartCtx.Provider value={{ data, size, innerRadius, total, slices, activeIndex, setActiveIndex }}>
-      <div className="relative inline-flex flex-col items-center">
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>{children}</svg>
+    <PieChartCtx.Provider value={{ data, size, innerRadius, total, slices, activeIndex, setActiveIndex, setMousePos, startAngle, endAngle, isGauge, cx, cy, containerRef }}>
+      <div ref={containerRef} className="relative inline-flex flex-col items-center select-none">
+        {/* Cursor-following tooltip — portaled to body to escape backdrop-blur containing block */}
+        {isGauge && activeItem && activeIndex !== null && createPortal(
+          <div
+            style={{
+              position: "fixed",
+              left: mousePos.x + 12,
+              top: mousePos.y - 16,
+              transform: "translateY(-100%)",
+              zIndex: 99999,
+              pointerEvents: "none",
+              whiteSpace: "nowrap",
+              background: "rgba(255,255,255,0.7)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
+              border: "1px solid rgba(255,255,255,0.9)",
+              boxShadow: "0 8px 30px rgb(0,0,0,0.06)",
+              borderRadius: 16,
+              padding: "12px 16px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 500, color: "#1e293b" }}>
+              <span style={{ width: 12, height: 4, borderRadius: 9999, flexShrink: 0, backgroundColor: activeItem.color }} />
+              {activeItem.label}
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 8, gap: 16 }}>
+              <span style={{ fontSize: 12, color: "#64748b", fontWeight: 400 }}>No.of scans</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginLeft: 12 }}>
+                {activeItem.value.toLocaleString()}
+              </span>
+            </div>
+          </div>,
+          document.body
+        )}
+        <svg width={size} height={svgHeight} viewBox={viewBox}>{children}</svg>
       </div>
     </PieChartCtx.Provider>
   );
 }
 
 export function PieSlice({ index }: { index: number }) {
-  const { size, innerRadius, slices, activeIndex, setActiveIndex } = useContext(PieChartCtx)!;
-  const cx = size / 2, cy = size / 2;
-  const outerR = size / 2 - 8 + (activeIndex === index ? 8 : 0);
+  const { size, innerRadius, slices, activeIndex, setActiveIndex, setMousePos, cx, cy } = useContext(PieChartCtx)!;
+  const outerR = size / 2 - 4 + (activeIndex === index ? 4 : 0);
+
   const { startAngle, endAngle, item } = slices[index];
 
-  const d = innerRadius > 0
-    ? describeSlice(cx, cy, outerR, innerRadius, startAngle, endAngle)
-    : (() => {
-        const s = polarToCartesian(cx, cy, outerR, startAngle);
-        const e = polarToCartesian(cx, cy, outerR, endAngle);
-        return `M ${cx} ${cy} L ${s.x} ${s.y} A ${outerR} ${outerR} 0 ${endAngle - startAngle > 180 ? 1 : 0} 1 ${e.x} ${e.y} Z`;
-      })();
+  const d = describeSlice(cx, cy, outerR, innerRadius, startAngle, endAngle, 1.5, 4);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
 
   return (
-    <path d={d} fill={item.color} stroke="white" strokeWidth={2}
+    <path
+      d={d}
+      fill={item.color}
       opacity={activeIndex !== null && activeIndex !== index ? 0.55 : 1}
-      style={{ transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)", cursor: "pointer" }}
-      onMouseEnter={() => setActiveIndex(index)}
+      style={{
+        transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+        cursor: "pointer",
+        filter: activeIndex === index ? "drop-shadow(0 4px 12px rgba(0,0,0,0.15))" : "none",
+      }}
+      onMouseEnter={(e) => { setActiveIndex(index); setMousePos({ x: e.clientX, y: e.clientY }); }}
+      onMouseMove={handleMouseMove}
       onMouseLeave={() => setActiveIndex(null)}
     />
   );
 }
 
-export function PieCenter({ defaultLabel = "Total" }: { defaultLabel?: string }) {
-  const { size, total, data, activeIndex } = useContext(PieChartCtx)!;
-  const cx = size / 2, cy = size / 2;
-  const label = activeIndex !== null ? data[activeIndex].label : defaultLabel;
-  const value = activeIndex !== null ? data[activeIndex].value.toLocaleString() : total.toLocaleString();
+export function PieCenter({ defaultLabel = "Total Scans" }: { defaultLabel?: string }) {
+  const { total, isGauge, cx, cy } = useContext(PieChartCtx)!;
+  // Position the text inside the arc: slightly above the geometric center for a gauge
+  const textCy = isGauge ? cy + 10 : cy;
   return (
     <g>
-      <text x={cx} y={cy - 6} textAnchor="middle" fontSize={22} fontWeight={900} fill="#0F172A">{value}</text>
-      <text x={cx} y={cy + 14} textAnchor="middle" fontSize={11} fontWeight={500} fill="#64748B">{label}</text>
+      <text x={cx} y={textCy - 45} textAnchor="middle" fontSize={13} fontWeight={500} fill="#64748B" letterSpacing="-0.01em">{defaultLabel}</text>
+      <text
+        x={cx}
+        y={textCy + 7}
+        textAnchor="middle"
+        fontSize={42}
+        fontWeight={700}
+        fill="#0F172A"
+        style={{ letterSpacing: "-0.02em" }}
+      >
+        {total.toLocaleString()}
+      </text>
     </g>
   );
 }
@@ -272,6 +421,7 @@ export function LineChart({
 }) {
   const [lines, setLines]           = useState<{ dataKey: string; stroke: string }[]>([]);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const [mousePos, setMousePos]     = useState({ x: 0, y: 0 });
 
   const chartW = 540, chartH = 230;
   const padding = { top: 20, right: 20, bottom: 38, left: 12 };
@@ -352,49 +502,54 @@ export function LineChart({
               const relX = ((e.clientX - left) / width) * chartW - padding.left;
               const idx = Math.round((relX / innerW) * (effectiveData.length - 1));
               setHoverIndex(Math.max(0, Math.min(effectiveData.length - 1, idx)));
+              setMousePos({ x: e.clientX, y: e.clientY });
             }}
             onMouseLeave={() => setHoverIndex(null)}
           />
         </svg>
 
-        {/* Floating tooltip – ultra-blurred glassmorphism styled */}
-        {hoverIndex !== null && effectiveData[hoverIndex] && (() => {
-          const pct = (getX(hoverIndex) / chartW) * 100;
-          const isRight = pct > 60;
-          return (
-            <div
-              className="absolute bg-white/40 backdrop-blur-3xl rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.12)] border border-white/60 pointer-events-none z-20 transition-all duration-150 ease-out"
-              style={{
-                left:      isRight ? "auto" : `${pct}%`,
-                right:     isRight ? `${100 - pct}%` : "auto",
-                top:       "10%",
-                minWidth:  "190px",
-                padding:   "14px 18px",
-              }}
-            >
-              {/* Month header */}
-              <p className="text-[11px] text-slate-400 mb-3 font-medium">
-                {(() => {
-                  const raw = effectiveData[hoverIndex][xDataKey];
-                  if (raw instanceof Date)
-                    return raw.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-                  // e.g. "May" → "May, 2026"
-                  return `${String(raw)}, 2026`;
-                })()}
-              </p>
-              {/* Rows */}
-              {lines.map(l => (
-                <div key={l.dataKey} className="flex items-center gap-3 py-[3px]">
-                  <span className="inline-block w-5 h-[2.5px] rounded-full shrink-0" style={{ background: l.stroke }} />
-                  <span className="text-[13px] text-slate-600 capitalize flex-1">{l.dataKey}</span>
-                  <span className="text-[15px] font-black text-slate-900 tabular-nums">
-                    {Number(effectiveData[hoverIndex][l.dataKey]).toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          );
-        })()}
+        {/* Floating tooltip – portaled to body, tracking mouse cursor */}
+        {hoverIndex !== null && effectiveData[hoverIndex] && createPortal(
+          <div
+            style={{
+              position: "fixed",
+              left: mousePos.x + 12,
+              top: mousePos.y - 16,
+              transform: "translateY(-100%)",
+              zIndex: 99999,
+              pointerEvents: "none",
+              whiteSpace: "nowrap",
+              background: "rgba(255,255,255,0.7)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
+              border: "1px solid rgba(255,255,255,0.9)",
+              boxShadow: "0 8px 30px rgb(0,0,0,0.06)",
+              borderRadius: 16,
+              padding: "14px 18px",
+            }}
+          >
+            {/* Month header */}
+            <p style={{ fontSize: 12, color: "#64748b", margin: "0 0 10px 0", fontWeight: 500 }}>
+              {(() => {
+                const raw = effectiveData[hoverIndex][xDataKey];
+                if (raw instanceof Date)
+                  return raw.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                return `${String(raw)}, 2026`;
+              })()}
+            </p>
+            {/* Rows */}
+            {lines.map(l => (
+              <div key={l.dataKey} style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: "3px", paddingBottom: "3px" }}>
+                <span style={{ width: 12, height: 4, borderRadius: 9999, flexShrink: 0, backgroundColor: l.stroke }} />
+                <span style={{ fontSize: 13, color: "#475569", textTransform: "capitalize", flex: 1 }}>{l.dataKey}</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", marginLeft: 16, fontFamily: "monospace" }}>
+                  {Number(effectiveData[hoverIndex][l.dataKey]).toLocaleString()}
+                </span>
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
       </div>
     </LineChartCtx.Provider>
   );
@@ -560,10 +715,10 @@ export function ChartLegend({
             }`}
           >
             <span
-              className="w-2.5 h-2.5 rounded-full inline-block shrink-0 transition-transform duration-200"
+              className="w-4.5 h-1.5 rounded-full inline-block shrink-0 transition-all duration-200"
               style={{
                 background: l.color,
-                transform: isSelected ? "scale(1.25)" : "scale(1)",
+                transform: isSelected ? "scale(1.15)" : "scale(1)",
               }}
             />
             <span className="capitalize text-slate-700">{l.label}</span>
