@@ -1,13 +1,6 @@
 import { useState } from "react";
 import {
   MoreHorizontal,
-  ExternalLink,
-  ShieldCheck,
-  Zap,
-  HardDrive,
-  ScanLine,
-  MessageSquare,
-  ArrowUpRight,
 } from "lucide-react";
 import {
   PieChart,
@@ -21,8 +14,7 @@ import {
   ChartTooltip,
   curveCatmullRom,
 } from "@bklitui/ui/charts";
-import velLogo from "@/assets/vel.png";
-import lensIcon from "@/assets/lens.svg";
+import profileImage from "@/assets/image.png";
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
@@ -52,10 +44,10 @@ const topModelsData = [
 ];
 
 const kpiCards = [
-  { icon: <HardDrive className="w-4 h-4" />, value: "740", label: "Device under test", iconBg: "bg-[#D8F5E5] text-[#15803D]" },
-  { icon: <ScanLine className="w-4 h-4" />, value: "12.3K", label: "Total scans", iconBg: "bg-[#DBEAFE] text-[#1D4ED8]" },
-  { icon: <ShieldCheck className="w-4 h-4" />, value: "98.2%", label: "Scan accuracy rate", iconBg: "bg-[#EDE9FE] text-[#6D28D9]" },
-  { icon: <Zap className="w-4 h-4" />, value: "64", label: "Total models", iconBg: "bg-[#FEF3C7] text-[#D97706]" },
+  { icon: <img src="/Disk.svg" alt="Disk" className="w-5 h-5 object-contain" />, value: "740", label: "Device under test", iconBg: "bg-[#D8F5E5] text-[#15803D]" },
+  { icon: <img src="/Box.svg" alt="Box" className="w-5 h-5 object-contain" />, value: "12.3K", label: "Total scans", iconBg: "bg-[#DBEAFE] text-[#1D4ED8]" },
+  { icon: <img src="/ShieldCorrect.svg" alt="ShieldCorrect" className="w-5 h-5 object-contain" />, value: "98.2%", label: "Scan accuracy rate", iconBg: "bg-[#EDE9FE] text-[#6D28D9]" },
+  { icon: <img src="/Zap.svg" alt="Zap" className="w-5 h-5 object-contain" />, value: "64", label: "Total models", iconBg: "bg-[#FEF3C7] text-[#D97706]" },
 ];
 
 const topProjects = [
@@ -145,16 +137,13 @@ export function App() {
         <header className="px-6 py-3 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2 select-none">
-            <img src={velLogo} alt="Murugan AI" className="w-7 h-7 object-contain" />
-            <span className="font-extrabold text-base text-slate-900 tracking-tight leading-none">
-              murugan <span className="text-[#0052FF]">ai</span>
-            </span>
+            <img src="/logo.svg" alt="Murugan AI" className="h-10 w-auto object-contain" />
           </div>
 
           {/* Nav Dock */}
           <div className="flex items-center gap-2">
             <nav className="flex items-center gap-0.5 bg-white p-1 rounded-full border border-white/80 shadow-sm">
-              {["Dashboard", "Applications", "DUT", "Labs"].map((item) => (
+              {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
                 <button
                   key={item}
                   onClick={() => setActiveNav(item)}
@@ -168,13 +157,13 @@ export function App() {
               ))}
             </nav>
             <button className="p-2 rounded-full bg-white transition-colors">
-              <img src={lensIcon} alt="Search" className="w-7 h-7 justify-center" />
+              <img src="/SearchIcon.svg" alt="Search" className="w-5 h-5 object-contain" />
             </button>
           </div>
 
           {/* Avatar */}
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-white/80 shadow-sm bg-white/60 flex items-center justify-center p-0.5">
-            <img src={velLogo} alt="Avatar" className="w-full h-full object-contain" />
+          <div className="w-11 h-11 rounded-full overflow-hidden border border-white/80 shadow-sm bg-white/60 flex items-center justify-center p-0.5">
+            <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
           </div>
         </header>
       </div>
@@ -184,7 +173,7 @@ export function App() {
 
         {/* Welcome row */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl sm:text-[28px] font-light text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-[28px] font-light text-slate-900 tracking-tight pl-6">
             Good morning,{" "}
             <span className="font-bold text-[#002574]">NCCS!</span>
           </h1>
@@ -215,7 +204,7 @@ export function App() {
               {kpiCards.map((card, i) => (
                 <div
                   key={i}
-                  className="bg-transparent backdrop-blur-lg border border-white/90 rounded-[28px] p-5 flex flex-col justify-center items-start h-full hover:bg-white/70 transition-all duration-200 relative overflow-hidden"
+                  className="bg-transparent backdrop-blur-lg border border-white/90 rounded-2xl p-5 flex flex-col justify-center items-start h-full hover:bg-white/70 transition-all duration-200 relative overflow-hidden"
                   style={{ boxShadow: "inset 3px 3px 6px rgba(0,0,0,0.05), inset -3px -3px 6px rgba(255,255,255,0.9), 0 2px 15px -2px rgba(0,0,0,0.03)" }}
                 >
                   <div className="flex items-center gap-3">
@@ -268,8 +257,8 @@ export function App() {
             <div className="col-span-4 bg-white/40 backdrop-blur-xl border border-white/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.04)] rounded-2xl p-6 flex flex-col h-full justify-between">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[22px] text-slate-800">Attention required</h3>
-                <button className="w-8 h-8 rounded-lg bg-white/60 border border-white/80 flex items-center justify-center text-slate-500 hover:text-[#0052FF] hover:bg-white/80 transition-colors shadow-sm">
-                  <ArrowUpRight className="w-5 h-5 text-slate-700" />
+                <button className="w-8 h-8 rounded-lg bg-white/60 border border-white/80 flex items-center justify-center hover:bg-white/80 transition-colors shadow-sm">
+                  <img src="/GoToArrow.svg" alt="Go to" className="w-4 h-4 object-contain" />
                 </button>
               </div>
               <div className="flex flex-col flex-1 divide-y divide-slate-200/40 justify-center">
@@ -292,19 +281,9 @@ export function App() {
                 ].map((alert, i) => (
                   <div key={i} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
                     {alert.isExclamation ? (
-                      <div className="w-12 h-12 rounded-[14px] bg-[#EBDAD2] flex items-center justify-center shrink-0 border border-white/40">
-                        <span className="text-[22px] font-extrabold text-[#A84A32] select-none">!</span>
-                      </div>
+                      <img src="/Warning.svg" alt="Warning" className="w-12 h-12 shrink-0 object-contain" />
                     ) : (
-                      <div className="w-12 h-12 rounded-[14px] bg-[#DCE3EE] flex items-center justify-center shrink-0 border border-white/40">
-                        <div className="relative flex items-center justify-center">
-                          <MessageSquare className="w-5 h-5 text-[#1E3A8A] fill-[#1E3A8A] opacity-25" />
-                          <MessageSquare className="w-5 h-5 text-[#1E3A8A] absolute" />
-                          <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-[#1E3A8A] rounded-full flex items-center justify-center text-[10px] font-bold text-white border border-[#DCE3EE]">
-                            ×
-                          </div>
-                        </div>
-                      </div>
+                      <img src="/Message.svg" alt="Message" className="w-12 h-12 shrink-0 object-contain" />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="text-[16px] font-medium text-slate-900 leading-snug">{alert.title}</div>
@@ -394,8 +373,8 @@ export function App() {
               <div className="bg-white/40 backdrop-blur-xl border border-white/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.04)] rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-5">
                   <h3 className="text-[22px] text-slate-800">Recent scans</h3>
-                  <button className="w-8 h-8 rounded-lg bg-white/60 border border-white/80 flex items-center justify-center text-slate-500 hover:text-[#0052FF] hover:bg-white/80 transition-colors shadow-sm">
-                    <ExternalLink className="w-4 h-4" />
+                  <button className="w-8 h-8 rounded-lg bg-white/60 border border-white/80 flex items-center justify-center hover:bg-white/80 transition-colors shadow-sm">
+                    <img src="/GoToArrow.svg" alt="Go to" className="w-4 h-4 object-contain" />
                   </button>
                 </div>
                 <div className="overflow-x-auto">
