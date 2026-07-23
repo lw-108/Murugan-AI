@@ -123,14 +123,14 @@ export const BackgroundGradientAnimation = ({
             </filter>
           </defs>
         </svg>
-        <div className={cn("gradients-container h-full w-full absolute inset-0 blur-lg", isSafari ? "blur-2xl" : "[filter:url(#blurMe)_blur(40px)]")}>
+        <div className={cn("gradients-container h-full w-full absolute inset-0 blur-lg opacity-[0.12]", isSafari ? "blur-2xl" : "[filter:url(#blurMe)_blur(40px)]")}>
           <div
             className={cn(
               `absolute [background:radial-gradient(circle_at_center,_rgba(var(--first-color),_0.8)_0,_rgba(var(--first-color),_0)_50%)_no-repeat]`,
               `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
               `[transform-origin:center_center]`,
               `animate-first`,
-              `opacity-100`
+              `opacity-20`
             )}
           ></div>
           <div
@@ -157,7 +157,7 @@ export const BackgroundGradientAnimation = ({
               `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
               `[transform-origin:calc(50%-200px)]`,
               `animate-fourth`,
-              `opacity-70`
+              `opacity-15`
             )}
           ></div>
           <div
@@ -177,7 +177,7 @@ export const BackgroundGradientAnimation = ({
               className={cn(
                 `absolute [background:radial-gradient(circle_at_center,_rgba(var(--pointer-color),_0.8)_0,_rgba(var(--pointer-color),_0)_50%)_no-repeat]`,
                 `[mix-blend-mode:var(--blending-value)] w-full h-full -top-1/2 -left-1/2`,
-                `opacity-70`
+                `opacity-10`
               )}
             ></div>
           )}

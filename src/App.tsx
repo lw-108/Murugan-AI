@@ -126,7 +126,7 @@ export function App() {
 
           {/* Nav Pill */}
           <nav className="flex items-center gap-0.5 bg-slate-900/5 backdrop-blur-md p-1 rounded-full border border-slate-900/10">
-            {["Dashboard", "Projects", "DUT", "Document validator", "Labs"].map((item) => (
+            {["Dashboard", "Applications", "DUT", "Configure"].map((item) => (
               <button
                 key={item}
                 onClick={() => setActiveNav(item)}
@@ -191,7 +191,7 @@ export function App() {
                   {card.icon}
                 </div>
                 <div>
-                  <div className="text-2xl font-black text-slate-900 tracking-tight leading-none">{card.value}</div>
+                  <div className="text-2xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: "'Unbounded', sans-serif" }}>{card.value}</div>
                   <div className="text-xs font-medium text-slate-500 mt-1">{card.label}</div>
                 </div>
               </div>
