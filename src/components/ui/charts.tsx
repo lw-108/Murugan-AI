@@ -3,7 +3,7 @@
 //             LineChart, Line, XAxis, Grid, Background, ChartLegend,
 //             ChartBrushLayout, ChartTooltip, curveCatmullRom
 
-import React, { createContext, useContext, useState, useRef } from "react";
+import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 // ─── Shared types ────────────────────────────────────────────────────────────
@@ -135,6 +135,13 @@ export function PieChart({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Dismiss tooltip on scroll so it doesn't stick to screen
+  useEffect(() => {
+    const dismiss = () => setActiveIndex(null);
+    window.addEventListener("scroll", dismiss, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", dismiss, { capture: true });
+  }, []);
   const total = data.reduce((s, d) => s + d.value, 0);
   const angleRange = endAngle - startAngle;
   const isGauge = angleRange < 360;
@@ -191,38 +198,51 @@ export function PieChart({
       <div ref={containerRef} className="relative inline-flex flex-col items-center select-none">
         {/* Cursor-following tooltip — portaled to body to escape backdrop-blur containing block */}
         {isGauge && activeItem && activeIndex !== null && createPortal(
-          <div
-            style={{
-              position: "fixed",
-              left: mousePos.x + 12,
-              top: mousePos.y - 16,
-              transform: "translateY(-100%)",
-              zIndex: 99999,
-              pointerEvents: "none",
-              whiteSpace: "nowrap",
-              background: "rgba(255,255,255,0.7)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              border: "1px solid rgba(255,255,255,0.9)",
-              boxShadow: "0 8px 30px rgb(0,0,0,0.06)",
-              borderRadius: 16,
-              padding: "12px 16px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 500, color: "#1e293b" }}>
-              <span style={{ width: 12, height: 4, borderRadius: 9999, flexShrink: 0, backgroundColor: activeItem.color }} />
-              {activeItem.label}
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 8, gap: 16 }}>
-              <span style={{ fontSize: 12, color: "#64748b", fontWeight: 400 }}>No.of scans</span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginLeft: 12 }}>
-                {activeItem.value.toLocaleString()}
-              </span>
-            </div>
-          </div>,
+          (() => {
+            const TOOLTIP_W = 180;
+            const TOOLTIP_H = 80;
+            const vw = window.innerWidth;
+            const flipX = mousePos.x + 12 + TOOLTIP_W > vw - 8;
+            const flipY = mousePos.y - 16 - TOOLTIP_H < 8;
+            const left = flipX ? mousePos.x - TOOLTIP_W - 12 : mousePos.x + 12;
+            const top  = flipY ? mousePos.y + 16 : mousePos.y - 16;
+            const transformY = flipY ? "translateY(0%)" : "translateY(-100%)";
+            return (
+              <div
+                style={{
+                  position: "fixed",
+                  left,
+                  top,
+                  transform: transformY,
+                  zIndex: 99999,
+                  pointerEvents: "none",
+                  whiteSpace: "nowrap",
+                  background: "rgba(255,255,255,0.80)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  border: "1px solid rgba(255,255,255,0.9)",
+                  boxShadow: "0 8px 30px rgb(0,0,0,0.08)",
+                  borderRadius: 16,
+                  padding: "12px 16px",
+                  transition: "left 0.1s ease, top 0.1s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 500, color: "#1e293b" }}>
+                  <span style={{ width: 12, height: 4, borderRadius: 9999, flexShrink: 0, backgroundColor: activeItem.color }} />
+                  {activeItem.label}
+                </div>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 8, gap: 16 }}>
+                  <span style={{ fontSize: 12, color: "#64748b", fontWeight: 400 }}>No.of scans</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginLeft: 12 }}>
+                    {activeItem.value.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            );
+          })(),
           document.body
         )}
-        <svg width={size} height={svgHeight} viewBox={viewBox}>{children}</svg>
+        <svg width={size} height={svgHeight} viewBox={viewBox} className="w-full max-w-full h-auto">{children}</svg>
       </div>
     </PieChartCtx.Provider>
   );
@@ -423,6 +443,13 @@ export function LineChart({
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [mousePos, setMousePos]     = useState({ x: 0, y: 0 });
 
+  // Dismiss tooltip on scroll so it doesn't stick to screen
+  useEffect(() => {
+    const dismiss = () => setHoverIndex(null);
+    window.addEventListener("scroll", dismiss, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", dismiss, { capture: true });
+  }, []);
+
   const chartW = 540, chartH = 230;
   const padding = { top: 20, right: 20, bottom: 38, left: 12 };
 
@@ -510,44 +537,60 @@ export function LineChart({
 
         {/* Floating tooltip – portaled to body, tracking mouse cursor */}
         {hoverIndex !== null && effectiveData[hoverIndex] && createPortal(
-          <div
-            style={{
-              position: "fixed",
-              left: mousePos.x + 12,
-              top: mousePos.y - 16,
-              transform: "translateY(-100%)",
-              zIndex: 99999,
-              pointerEvents: "none",
-              whiteSpace: "nowrap",
-              background: "rgba(255,255,255,0.7)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              border: "1px solid rgba(255,255,255,0.9)",
-              boxShadow: "0 8px 30px rgb(0,0,0,0.06)",
-              borderRadius: 16,
-              padding: "14px 18px",
-            }}
-          >
-            {/* Month header */}
-            <p style={{ fontSize: 12, color: "#64748b", margin: "0 0 10px 0", fontWeight: 500 }}>
-              {(() => {
-                const raw = effectiveData[hoverIndex][xDataKey];
-                if (raw instanceof Date)
-                  return raw.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-                return `${String(raw)}, 2026`;
-              })()}
-            </p>
-            {/* Rows */}
-            {lines.map(l => (
-              <div key={l.dataKey} style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: "3px", paddingBottom: "3px" }}>
-                <span style={{ width: 12, height: 4, borderRadius: 9999, flexShrink: 0, backgroundColor: l.stroke }} />
-                <span style={{ fontSize: 13, color: "#475569", textTransform: "capitalize", flex: 1 }}>{l.dataKey}</span>
-                <span style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", marginLeft: 16, fontFamily: "monospace" }}>
-                  {Number(effectiveData[hoverIndex][l.dataKey]).toLocaleString()}
-                </span>
+          (() => {
+            // Estimate tooltip width ~200px, height ~140px; auto-flip when near viewport edges
+            const TOOLTIP_W = 210;
+            const TOOLTIP_H = 160;
+            const vw = window.innerWidth;
+            const flipX = mousePos.x + 12 + TOOLTIP_W > vw - 8;
+            const flipY = mousePos.y - 16 - TOOLTIP_H < 8;
+
+            const left  = flipX ? mousePos.x - TOOLTIP_W - 12 : mousePos.x + 12;
+            const top   = flipY ? mousePos.y + 16             : mousePos.y - 16;
+            const transformY = flipY ? "translateY(0%)" : "translateY(-100%)";
+
+            return (
+              <div
+                style={{
+                  position: "fixed",
+                  left,
+                  top,
+                  transform: transformY,
+                  zIndex: 99999,
+                  pointerEvents: "none",
+                  whiteSpace: "nowrap",
+                  background: "rgba(255,255,255,0.80)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  border: "1px solid rgba(255,255,255,0.9)",
+                  boxShadow: "0 8px 30px rgb(0,0,0,0.08)",
+                  borderRadius: 16,
+                  padding: "14px 18px",
+                  transition: "left 0.1s ease, top 0.1s ease",
+                }}
+              >
+                {/* Month header */}
+                <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 10px 0", fontWeight: 400 }}>
+                  {(() => {
+                    const raw = effectiveData[hoverIndex][xDataKey];
+                    if (raw instanceof Date)
+                      return raw.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                    return `${String(raw)}, 2026`;
+                  })()}
+                </p>
+                {/* Rows */}
+                {lines.map(l => (
+                  <div key={l.dataKey} style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: "3px", paddingBottom: "3px" }}>
+                    <span style={{ width: 12, height: 4, borderRadius: 9999, flexShrink: 0, backgroundColor: l.stroke }} />
+                    <span style={{ fontSize: 14, color: "#475569", textTransform: "capitalize", flex: 1, fontWeight: 400 }}>{l.dataKey}</span>
+                    <span style={{ fontSize: 16, fontWeight: 400, color: "#0f172a", marginLeft: 16, fontFamily: "monospace" }}>
+                      {Number(effectiveData[hoverIndex][l.dataKey]).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>,
+            );
+          })(),
           document.body
         )}
       </div>
@@ -613,8 +656,8 @@ export function XAxis({ dataKey }: { dataKey?: string }) {
         return (
           <text key={i} x={getX(i)} y={chartH - padding.bottom + 18}
             textAnchor="middle"
-            fontSize={12}
-            fontWeight={isActive ? 700 : 400}
+            fontSize={13}
+            fontWeight={400}
             fill={isActive ? "#2563EB" : "#9CA3AF"}
             fontFamily="Inter, sans-serif">
             {label}
@@ -701,7 +744,7 @@ export function ChartLegend({
     ?? [];
   if (resolved.length === 0) return null;
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-slate-600 mt-4 pt-3 border-t border-slate-100/80">
+    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-slate-600 mt-4 pt-3 border-t border-slate-100/80">
       {resolved.map((l, i) => {
         const isSelected = activeIndex === i;
         const isDimmed = activeIndex !== null && activeIndex !== undefined && !isSelected;
@@ -711,7 +754,7 @@ export function ChartLegend({
             onMouseEnter={() => onHover?.(i)}
             onMouseLeave={() => onHover?.(null)}
             className={`flex items-center gap-2 cursor-pointer transition-all duration-200 ${
-              isDimmed ? "opacity-40" : "opacity-100 font-medium"
+              isDimmed ? "opacity-40" : "opacity-100 font-normal"
             }`}
           >
             <span

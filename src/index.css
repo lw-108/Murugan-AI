@@ -125,13 +125,81 @@ html, body {
 }
 
 :root {
+    /* ─────────────────────────────────────────────────────────────
+       WHITE-LABEL DESIGN TOKENS
+       Override any of these variables to re-brand the entire app.
+       ───────────────────────────────────────────────────────────── */
+
+    /* Brand / Primary */
+    --wl-brand:            #004FEC;        /* primary accent (nav active, headings) */
+    --wl-brand-light:      #1D5BD8;        /* lighter variant (links, running line) */
+    --wl-brand-pale:       #C9D9F8;        /* very light brand tint (badge bg) */
+    --wl-brand-on:         #ffffff;        /* text on brand-colored surfaces */
+
+    /* Status colours */
+    --wl-success:          #3AA76D;        /* success / completed */
+    --wl-warning:          #D97706;        /* stopped / warning */
+    --wl-danger:           #C83D22;        /* failed / danger */
+    --wl-info:             #0052FF;        /* info / ongoing */
+
+    /* Page & surface backgrounds */
+    --wl-bg-page:          #F8FAFC;        /* entire page background */
+    --wl-bg-card:          #ffffff;        /* card / panel surface */
+    --wl-bg-card-hover:    rgba(255,255,255,0.70); /* card hover state */
+    --wl-bg-nav:           #ffffff;        /* navbar pill background */
+    --wl-bg-input:         #ffffff;        /* input / search bg */
+
+    /* Borders */
+    --wl-border-card:      #e0f2fe;        /* card border (sky-100) */
+    --wl-border-nav:       rgba(203,213,225,0.80); /* navbar border (slate-200/80) */
+    --wl-border-divider:   rgba(203,213,225,0.70); /* table / section dividers */
+    --wl-border-glass:     rgba(255,255,255,0.90); /* glass morphism border */
+
+    /* Text */
+    --wl-text-heading:     #0f172a;        /* large headings */
+    --wl-text-body:        #334155;        /* default body text */
+    --wl-text-secondary:   #64748b;        /* secondary / muted labels */
+    --wl-text-placeholder: #94a3b8;        /* placeholder / timestamp */
+    --wl-text-on-brand:    #ffffff;        /* text on brand bg */
+
+    /* KPI stat cards */
+    --wl-kpi-value-color:  #000000;        /* large numeric value */
+    --wl-kpi-label-color:  #1e293b;        /* label beneath value */
+
+    /* Shadows */
+    --wl-shadow-card:      0 4px 20px -2px rgba(0,0,0,0.04);
+    --wl-shadow-nav:       0 1px 4px rgba(0,0,0,0.06);
+
+    /* Radius */
+    --wl-radius-card:      1rem;           /* 16px */
+    --wl-radius-pill:      9999px;
+
+    /* Chart colours (line chart) */
+    --wl-chart-running:    #1D5BD8;
+    --wl-chart-success:    #3AA76D;
+    --wl-chart-failed:     #C83D22;
+    --wl-chart-stopped:    #D97706;
+
+    /* Chart colours (pie / gauge) */
+    --wl-pie-1:            #1D5BD8;
+    --wl-pie-2:            #3AA76D;
+    --wl-pie-3:            #C83D22;
+    --wl-pie-4:            #D97706;
+
+    /* Status badge backgrounds */
+    --wl-badge-ongoing-bg: rgba(0,82,255,0.10);
+    --wl-badge-completed-bg: rgba(167,243,208,0.80);  /* emerald-100/80 */
+    --wl-badge-stopped-bg:  rgba(254,205,211,0.80);   /* rose-100/80 */
+    --wl-badge-text:       #000000;
+
+    /* ── Shadcn / Tailwind system tokens (mapped to brand where appropriate) */
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: #002574;
+    --primary: #004FEC;
     --primary-foreground: oklch(0.97 0.014 254.604);
     --secondary: oklch(0.967 0.001 286.375);
     --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -235,7 +303,8 @@ html, body {
     @apply border-border outline-ring/50;
     }
   body {
-    @apply bg-[#F8FAFC] text-slate-800;
+    background-color: var(--wl-bg-page);
+    color: var(--wl-text-body);
     }
   html {
     @apply font-sans;
@@ -269,7 +338,7 @@ html, body {
 }
 
 /* Glow Blobs */
-@keyframes blob-float {
+/* @keyframes blob-float {
   0% {
     transform: translate(0px, 0px) scale(1);
   }
@@ -282,9 +351,9 @@ html, body {
   100% {
     transform: translate(0px, 0px) scale(1);
   }
-}
+} */
 
-.animate-blob {
+/* .animate-blob {
   animation: blob-float 10s infinite alternate ease-in-out;
 }
 
@@ -294,4 +363,4 @@ html, body {
 
 .animation-delay-4000 {
   animation-delay: 4s;
-}
+} */
