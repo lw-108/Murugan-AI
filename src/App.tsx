@@ -125,69 +125,71 @@ export function App() {
         className="fixed inset-0 -z-10 bg-[#f8fafc]"
       />
 
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-        {/* Logo */}
-        <div className="flex items-center gap-2 select-none shrink-0">
-          <img src="/logo.svg" alt="Murugan AI" className="h-8 sm:h-9 w-auto object-contain" />
-        </div>
-
-        {/* Desktop / Laptop / Tablet View: Long size navbar with detached search icon right next to it */}
-        <div className="hidden sm:flex items-center justify-center flex-1 mx-4 gap-3">
-          <nav className="flex items-center gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm">
-            {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
-              <button
-                key={item}
-                onClick={() => setActiveNav(item)}
-                className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${activeNav === item
-                    ? "bg-[#004FEC] text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-              >
-                {item}
-              </button>
-            ))}
-          </nav>
-          <button
-            title="Search"
-            className="w-10 h-10 rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center cursor-pointer shrink-0"
-          >
-            <img src="/SearchIcon.svg" alt="Search" className="w-5 h-5 object-contain" />
-          </button>
-        </div>
-
-        {/* Desktop / Laptop / Tablet Right Section: Profile Avatar */}
-        <div className="hidden sm:flex items-center shrink-0">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
-            <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+      {/* ── Header (Sticky across both mobile & desktop) ───────────────────── */}
+      <header className="sticky top-0 z-50 w-full transition-all  backdrop-blur-md">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+          {/* Logo */}
+          <div className="flex items-center gap-2 select-none shrink-0">
+            <img src="/logo.svg" alt="Murugan AI" className="h-8 sm:h-9 w-auto object-contain" />
           </div>
-        </div>
 
-        {/* Mobile View: Strictly keep existing compact navbar dock with search inside */}
-        <div className="flex sm:hidden items-center justify-center">
-          <nav className="flex items-center gap-0.5 bg-white p-0.5 rounded-full border border-slate-200/80 shadow-sm">
-            {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
-              <button
-                key={item}
-                onClick={() => setActiveNav(item)}
-                className={`px-2 py-1 rounded-full text-[11px] font-semibold transition-all duration-200 whitespace-nowrap ${activeNav === item
-                    ? "bg-[#004FEC] text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-              >
-                {item}
-              </button>
-            ))}
-            <div className="h-4 w-px bg-slate-200 mx-0.5 shrink-0" />
+          {/* Desktop / Laptop / Tablet View: Long size navbar with white background pill */}
+          <div className="hidden sm:flex items-center justify-center flex-1 mx-4 gap-3">
+            <nav className="flex items-center gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm">
+              {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => setActiveNav(item)}
+                  className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${activeNav === item
+                      ? "bg-[#004FEC] text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </nav>
             <button
               title="Search"
-              className="p-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center cursor-pointer shrink-0"
             >
-              <img src="/SearchIcon.svg" alt="Search" className="w-3.5 h-3.5 object-contain" />
+              <img src="/SearchIcon.svg" alt="Search" className="w-5 h-5 object-contain" />
             </button>
-          </nav>
+          </div>
+
+          {/* Desktop / Laptop / Tablet Right Section: Profile Avatar */}
+          <div className="hidden sm:flex items-center shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
+              <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+            </div>
+          </div>
+
+          {/* Mobile View: Compact white navbar pill with search inside */}
+          <div className="flex sm:hidden items-center justify-center">
+            <nav className="flex items-center gap-0.5 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm">
+              {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => setActiveNav(item)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all duration-200 whitespace-nowrap ${activeNav === item
+                      ? "bg-[#004FEC] text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                >
+                  {item}
+                </button>
+              ))}
+              <div className="h-4 w-px bg-slate-200 mx-0.5 shrink-0" />
+              <button
+                title="Search"
+                className="p-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
+              >
+                <img src="/SearchIcon.svg" alt="Search" className="w-3.5 h-3.5 object-contain" />
+              </button>
+            </nav>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* ── Main ────────────────────────────────────────────────────────────── */}
       <main className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 pt-2 sm:pt-4 pb-6 sm:pb-8 flex flex-col gap-5 sm:gap-6">
@@ -197,7 +199,7 @@ export function App() {
           <h1 className="text-xl sm:text-2xl md:text-[28px] font-light tracking-tight sm:pl-2 md:pl-4 bg-gradient-to-r from-black via-[#001D6E] to-[#004FEC] bg-clip-text text-transparent">
             Good morning Admin
           </h1>
-          <div className="flex items-center gap-1 bg-white/60 backdrop-blur-xl border border-white/80 rounded-full p-1 shadow-sm overflow-x-auto max-w-full">
+          <div className="flex items-center gap-1 bg-white/60 backdrop-blur-xl border border-white/80 rounded-full p-1 shadow-sm overflow-x-auto max-w-full mx-auto">
             {["This Week", "This Month", "Custom"].map((t) => (
               <button
                 key={t}
@@ -480,7 +482,7 @@ export function App() {
                             {proj.rules}
                           </span>
                         </div>
-                        <div className="w-full h-9 sm:h-12 rounded-xl overflow-hidden flex border border-white/40 shadow-inner">
+                        <div className="w-full h-9 sm:h-12 rounded-md overflow-hidden flex border border-white/40 shadow-inner">
                           {proj.segments.map((seg, sIdx) =>
                             seg.val > 0 ? (
                               <div
