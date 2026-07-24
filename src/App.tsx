@@ -127,66 +127,54 @@ export function App() {
 
       {/* ── Header (Sticky across both mobile & desktop) ───────────────────── */}
       <header className="sticky top-0 z-50 w-full transition-all  backdrop-blur-md">
-        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-          {/* Logo */}
-          <div className="flex items-center gap-2 select-none shrink-0">
-            <img src="/logo.svg" alt="Murugan AI" className="h-8 sm:h-9 w-auto object-contain" />
-          </div>
-
-          {/* Desktop / Laptop / Tablet View: Long size navbar with white background pill */}
-          <div className="hidden sm:flex items-center justify-center flex-1 mx-4 gap-3">
-            <nav className="flex items-center gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm">
-              {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setActiveNav(item)}
-                  className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${activeNav === item
-                      ? "bg-[#004FEC] text-white shadow-sm"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                    }`}
-                >
-                  {item}
-                </button>
-              ))}
-            </nav>
-            <button
-              title="Search"
-              className="w-10 h-10 rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center cursor-pointer shrink-0"
-            >
-              <img src="/SearchIcon.svg" alt="Search" className="w-5 h-5 object-contain" />
-            </button>
-          </div>
-
-          {/* Desktop / Laptop / Tablet Right Section: Profile Avatar */}
-          <div className="hidden sm:flex items-center shrink-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
-              <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+        <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
+          {/* Desktop view: All inline, Mobile/Tablet: Logo and profile top, navbar bottom */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-3 lg:gap-4">
+            {/* Logo */}
+            <div className="flex items-center gap-2 select-none shrink-0">
+              <img src="/logo.svg" alt="Murugan AI" className="h-6 sm:h-7 md:h-8 lg:h-9 w-auto object-contain" />
             </div>
-          </div>
 
-          {/* Mobile View: Compact white navbar pill with search inside */}
-          <div className="flex sm:hidden items-center justify-center">
-            <nav className="flex items-center gap-0.5 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm">
-              {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
+            {/* Navigation Bar with Search icon wrapper */}
+            <div className="flex items-center gap-1 lg:flex-1 lg:justify-center">
+              <nav className="flex items-center gap-0.5 sm:gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm w-full max-w-fit lg:flex-1 lg:justify-center">
+                {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => setActiveNav(item)}
+                    className={`px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold transition-all duration-200 whitespace-nowrap flex-1 ${activeNav === item
+                        ? "bg-[#004FEC] text-white shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+                {/* Search icon - only visible on small screens, merged with navbar */}
+                <div className="lg:hidden h-4 w-px bg-slate-200 mx-0.5 sm:mx-1 shrink-0" />
                 <button
-                  key={item}
-                  onClick={() => setActiveNav(item)}
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all duration-200 whitespace-nowrap ${activeNav === item
-                      ? "bg-[#004FEC] text-white shadow-sm"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                    }`}
+                  title="Search"
+                  className="lg:hidden p-1.5 sm:p-2 md:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
                 >
-                  {item}
+                  <img src="/SearchIcon.svg" alt="Search" className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 object-contain" />
                 </button>
-              ))}
-              <div className="h-4 w-px bg-slate-200 mx-0.5 shrink-0" />
+              </nav>
+
+              {/* Search icon - only visible on desktop, separate from navbar */}
               <button
                 title="Search"
-                className="p-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
+                className="hidden lg:flex rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all items-center justify-center cursor-pointer shrink-0 h-[52px] w-[52px]"
               >
-                <img src="/SearchIcon.svg" alt="Search" className="w-3.5 h-3.5 object-contain" />
+                <img src="/SearchIcon.svg" alt="Search" className="w-5 h-5 object-contain" />
               </button>
-            </nav>
+            </div>
+
+            {/* Profile Avatar */}
+            <div className="flex items-center shrink-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
+                <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -195,11 +183,11 @@ export function App() {
       <main className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 pt-2 sm:pt-4 pb-6 sm:pb-8 flex flex-col gap-5 sm:gap-6">
 
         {/* Welcome row */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-3">
           <h1 className="text-xl sm:text-2xl md:text-[28px] font-light tracking-tight sm:pl-2 md:pl-4 bg-gradient-to-r from-black via-[#001D6E] to-[#004FEC] bg-clip-text text-transparent">
             Good morning Admin
           </h1>
-          <div className="flex items-center gap-1 bg-white/60 backdrop-blur-xl border border-white/80 rounded-full p-1 shadow-sm overflow-x-auto max-w-full mx-auto">
+          <div className="flex items-center gap-1 bg-white/60 backdrop-blur-xl border border-white/80 rounded-full p-1 shadow-sm overflow-x-auto max-w-full mx-auto sm:mx-0">
             {["This Week", "This Month", "Custom"].map((t) => (
               <button
                 key={t}
@@ -234,13 +222,13 @@ export function App() {
                       {card.icon}
                     </div>
                     <div
-                      className="text-2xl sm:text-3xl md:text-3xl lg:text-[42px] xl:text-[48px] text-black tracking-normal leading-none"
+                      className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[64px] text-black tracking-normal leading-none"
                       style={{ fontFamily: '"mozilla-headline-condensed", sans-serif', fontWeight: 600 }}
                     >
                       {card.value}
                     </div>
                   </div>
-                  <div className="text-xs sm:text-sm md:text-sm lg:text-base xl:text-[18px] font-normal text-slate-900 tracking-tight mt-1.5 sm:mt-2 lg:mt-3 text-left leading-snug" style={{ fontFamily: '"Figtree", sans-serif' }}>
+                  <div className="text-sm sm:text-base md:text-base lg:text-lg xl:text-xl font-normal text-slate-900 tracking-tight mt-1.5 sm:mt-2 lg:mt-3 text-left leading-snug" style={{ fontFamily: '"ManropeLocal", "Manrope", sans-serif' }}>
                     {card.label}
                   </div>
                 </div>
@@ -251,7 +239,7 @@ export function App() {
             <div className="md:col-span-1 lg:col-span-4 relative flex flex-col h-full">
               <div className="bg-white border border-sky-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.04)] rounded-2xl p-4 sm:p-5 flex flex-col h-full justify-between">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-lg sm:text-[22px] text-slate-800 font-normal">Scan activity timeline</h3>
+                  <h3 className="text-lg sm:text-[22px] text-slate-800 font-manrope">Scan activity 3 timeline</h3>
                   <span className="text-[12px] sm:text-[13px] text-slate-500 font-normal">May, 2026</span>
                 </div>
                 <div className="flex-1 min-h-[160px] w-full flex items-center justify-center overflow-hidden">
@@ -352,20 +340,20 @@ export function App() {
                 </div>
 
                 {/* Top 5 Models (md:col-span-6) */}
-                <div className="md:col-span-6 bg-white border border-sky-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.04)] rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+                <div className="md:col-span-6 bg-white border border-sky-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.04)] rounded-2xl p-3 sm:p-4 md:p-5 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-lg sm:text-[22px] text-slate-800 mb-4 sm:mb-5">
+                    <h3 className="text-base sm:text-lg md:text-xl lg:text-[22px] xl:text-[24px] text-slate-800 mb-3 sm:mb-4 md:mb-5">
                       Top 5 models{" "}
-                      <span className="font-normal text-slate-500 text-sm sm:text-[22px] block sm:inline">(Execution &amp; Success rates)</span>
+                      <span className="font-normal text-slate-500 text-xs sm:text-sm md:text-base lg:text-[22px] xl:text-[24px] block sm:inline">(Execution &amp; Success rates)</span>
                     </h3>
-                    <div className="flex flex-col gap-3 sm:gap-3.5 flex-1">
+                    <div className="flex flex-col gap-2 sm:gap-2.5 md:gap-3 lg:gap-3.5 flex-1">
                       {topModelsData.map((item, idx) => {
                         const pct = (item.count / item.max) * 100;
                         const opacities = [1.0, 0.88, 0.73, 0.53, 0.35];
                         return (
-                          <div key={idx} className="flex items-center gap-2 sm:gap-3">
-                            <span className="w-24 sm:w-36 text-xs sm:text-[15px] text-slate-700 shrink-0 truncate text-left">{item.name}</span>
-                            <div className="flex-1 h-8 sm:h-9 relative overflow-hidden rounded-xl bg-slate-100/90 flex items-center">
+                          <div key={idx} className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-3">
+                            <span className="w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36 text-[10px] sm:text-xs md:text-[13px] lg:text-[14px] xl:text-[15px] text-slate-700 shrink-0 truncate text-left">{item.name}</span>
+                            <div className="flex-1 h-6 sm:h-7 md:h-8 lg:h-9 relative overflow-hidden rounded-xl bg-slate-100/90 flex items-center">
                               {/* Background progress bar */}
                               <div
                                 className="absolute left-0 top-0 bottom-0 transition-all duration-500 rounded-xl"
@@ -375,7 +363,7 @@ export function App() {
                                 }}
                               />
                               {/* Base text (dark slate for greyed track area) */}
-                              <span className="absolute left-0 px-3 sm:px-4 text-xs sm:text-[14px] font-semibold text-slate-700 whitespace-nowrap">
+                              <span className="absolute left-0 px-2 sm:px-2.5 md:px-3 lg:px-3.5 xl:px-4 text-[9px] sm:text-[10px] md:text-xs lg:text-[13px] xl:text-[14px] font-semibold text-slate-700 whitespace-nowrap">
                                 {item.scans}&nbsp;&nbsp;&nbsp;&nbsp;{idx === 4 ? "" : item.successRate}
                               </span>
                               {/* Overlay text (white for filled bar area, clipped to filled width) */}
@@ -383,7 +371,7 @@ export function App() {
                                 className="absolute left-0 top-0 bottom-0 overflow-hidden flex items-center transition-all duration-500 rounded-xl"
                                 style={{ width: `${pct}%` }}
                               >
-                                <span className="px-3 sm:px-4 text-xs sm:text-[14px] font-semibold text-white whitespace-nowrap">
+                                <span className="px-2 sm:px-2.5 md:px-3 lg:px-3.5 xl:px-4 text-[9px] sm:text-[10px] md:text-xs lg:text-[13px] xl:text-[14px] font-semibold text-white whitespace-nowrap">
                                   {item.scans}&nbsp;&nbsp;&nbsp;&nbsp;{idx === 4 ? "" : item.successRate}
                                 </span>
                               </div>
@@ -393,7 +381,7 @@ export function App() {
                       })}
                     </div>
                   </div>
-                  <div className="flex justify-between text-[11px] sm:text-[13px] text-slate-500 mt-4 sm:mt-5 pt-3 border-t border-white/60">
+                  <div className="flex justify-between text-[9px] sm:text-[10px] md:text-[11px] lg:text-[12px] xl:text-[13px] text-slate-500 mt-3 sm:mt-4 md:mt-5 pt-2 sm:pt-3 border-t border-white/60">
                     {[0, 500, 1000, 1500, 2500, 3000].map((v) => <span key={v}>{v}</span>)}
                   </div>
                 </div>
