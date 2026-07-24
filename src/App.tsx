@@ -226,7 +226,7 @@ export function App() {
               {kpiCards.map((card, i) => (
                 <div
                   key={i}
-                  className="bg-transparent backdrop-blur-lg border border-white/90 rounded-2xl p-3.5 sm:p-5 flex flex-col justify-center items-start h-full hover:bg-white/70 transition-all duration-200 relative overflow-hidden"
+                  className="bg-transparent backdrop-blur-lg border border-white/90 rounded-2xl p-2.5 sm:p-3.5 md:p-4 lg:p-5 flex flex-col justify-center items-start h-full hover:bg-white/70 transition-all duration-200 relative overflow-hidden"
                   style={{ boxShadow: "inset 3px 3px 6px rgba(0,0,0,0.05), inset -3px -3px 6px rgba(255,255,255,0.9), 0 2px 15px -2px rgba(0,0,0,0.03)" }}
                 >
                   <div className="flex items-center gap-2.5 sm:gap-3">
@@ -234,13 +234,13 @@ export function App() {
                       {card.icon}
                     </div>
                     <div
-                      className="text-3xl sm:text-4xl lg:text-[48px] xl:text-[52px] text-black tracking-normal leading-none"
+                      className="text-2xl sm:text-3xl md:text-3xl lg:text-[42px] xl:text-[48px] text-black tracking-normal leading-none"
                       style={{ fontFamily: '"mozilla-headline-condensed", sans-serif', fontWeight: 600 }}
                     >
                       {card.value}
                     </div>
                   </div>
-                  <div className="text-sm sm:text-base lg:text-[18px] xl:text-[20px] font-normal text-slate-900 tracking-tight mt-2 sm:mt-3 text-left" style={{ fontFamily: '"Figtree", sans-serif' }}>
+                  <div className="text-xs sm:text-sm md:text-sm lg:text-base xl:text-[18px] font-normal text-slate-900 tracking-tight mt-1.5 sm:mt-2 lg:mt-3 text-left leading-snug" style={{ fontFamily: '"Figtree", sans-serif' }}>
                     {card.label}
                   </div>
                 </div>
