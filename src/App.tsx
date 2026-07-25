@@ -128,7 +128,7 @@ export function App() {
       {/* ── Header (Sticky across both mobile & desktop) ───────────────────── */}
       <header className="sticky top-0 z-50 w-full transition-all  backdrop-blur-md">
         <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-          {/* Desktop view: All inline, Mobile/Tablet: Logo and profile top, navbar bottom */}
+          {/* Responsive Header: Single row on lg+ screens, stacked on smaller screens */}
           <div className="flex flex-col lg:flex-row items-center justify-between gap-3 lg:gap-4">
             {/* Logo */}
             <div className="flex items-center gap-2 select-none shrink-0">
@@ -137,7 +137,7 @@ export function App() {
 
             {/* Navigation Bar with Search icon wrapper */}
             <div className="flex items-center gap-1 lg:flex-1 lg:justify-center">
-              <nav className="flex items-center gap-0.5 sm:gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm w-full max-w-fit lg:flex-1 lg:justify-center">
+              <nav className="flex items-center gap-0.5 sm:gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm w-full lg:flex-1 lg:justify-center">
                 {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
                   <button
                     key={item}
@@ -160,7 +160,7 @@ export function App() {
                 </button>
               </nav>
 
-              {/* Search icon - only visible on desktop, separate from navbar */}
+              {/* Search icon - only visible on wide screens, separate from navbar */}
               <button
                 title="Search"
                 className="hidden lg:flex rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all items-center justify-center cursor-pointer shrink-0 h-[52px] w-[52px]"
