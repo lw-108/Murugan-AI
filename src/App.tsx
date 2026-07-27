@@ -126,23 +126,24 @@ export function App() {
       />
 
       {/* ── Header (Sticky across both mobile & desktop) ───────────────────── */}
-      <header className="sticky top-0 z-50 w-full transition-all  backdrop-blur-md">
+      {/* ── Header (Sticky across both mobile & desktop) ───────────────────── */}
+      <header className="sticky top-0 z-50 w-full transition-all backdrop-blur-md">
         <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-          {/* Responsive Header: Single row on md+ screens, stacked on smaller screens */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 w-full">
-            {/* Logo - on left */}
+          <div className="flex items-center justify-between gap-3 md:gap-4 w-full">
+            {/* Logo - Always on left */}
             <div className="flex items-center gap-2 select-none shrink-0">
               <img src="/logo.svg" alt="Murugan AI" className="h-6 sm:h-7 md:h-8 lg:h-9 w-auto object-contain" />
             </div>
 
-            {/* Navigation Bar with Search icon and Profile - grouped on right for small screens */}
+            {/* Center group: Navigation + Search + Profile for desktop, Nav only for mobile */}
             <div className="flex items-center gap-2 md:gap-3 lg:flex-1 lg:justify-center">
-              <nav className="flex items-center gap-0.5 sm:gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm max-w-fit">
+              {/* Navigation Bar - Always centered */}
+              <nav className="flex items-center gap-0.5 sm:gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm">
                 {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
                   <button
                     key={item}
                     onClick={() => setActiveNav(item)}
-                    className={`px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold transition-all duration-200 whitespace-nowrap flex-1 ${activeNav === item
+                    className={`px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold transition-all duration-200 whitespace-nowrap ${activeNav === item
                         ? "bg-[#004FEC] text-white shadow-sm"
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                       }`}
@@ -150,29 +151,37 @@ export function App() {
                     {item}
                   </button>
                 ))}
-                {/* Search icon - only visible on small screens, merged with navbar */}
+
+                {/* Search icon - Only merged with navbar on small screens (< md) */}
                 <div className="md:hidden h-4 w-px bg-slate-200 mx-0.5 sm:mx-1 shrink-0" />
                 <button
                   title="Search"
-                  className="md:hidden p-1.5 sm:p-2 md:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
+                  className="md:hidden p-1.5 sm:p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
                 >
-                  <img src="/SearchIcon.svg" alt="Search" className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 object-contain" />
+                  <img src="/SearchIcon.svg" alt="Search" className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain" />
                 </button>
               </nav>
 
-              {/* Search icon - only visible on wide screens, separate from navbar */}
+              {/* Search icon - Detached from navbar on desktop, near right side of navbar */}
               <button
                 title="Search"
-                className="hidden md:flex rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all items-center justify-center cursor-pointer shrink-0 h-[52px] w-[52px]"
+                className="hidden md:flex rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all items-center justify-center cursor-pointer shrink-0 h-[40px] w-[40px] lg:h-[52px] lg:w-[52px]"
               >
-                <img src="/SearchIcon.svg" alt="Search" className="w-5 h-5 object-contain" />
+                <img src="/SearchIcon.svg" alt="Search" className="w-4 h-4 lg:w-5 lg:h-5 object-contain" />
               </button>
 
-              {/* Profile Avatar - grouped with navbar on small screens, separate on large */}
-              <div className="flex items-center shrink-0">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
+              {/* Profile Avatar - Sticks near search icon on tablets/small laptops, right end on large screens */}
+              <div className="hidden md:flex items-center shrink-0 lg:absolute lg:right-6 xl:right-8">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
                   <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 </div>
+              </div>
+            </div>
+
+            {/* Profile Avatar - Visible only on mobile, near navbar and search */}
+            <div className="flex md:hidden items-center shrink-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
+                <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
               </div>
             </div>
           </div>
@@ -193,8 +202,8 @@ export function App() {
                 key={t}
                 onClick={() => setActiveTimeframe(t)}
                 className={`px-3 sm:px-4 py-1.5 rounded-full text-[12px] font-semibold transition-all whitespace-nowrap ${activeTimeframe === t
-                    ? "bg-[#004FEC] text-white shadow"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
+                  ? "bg-[#004FEC] text-white shadow"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
                   }`}
               >
                 {t}
