@@ -128,16 +128,16 @@ export function App() {
       {/* ── Header (Sticky across both mobile & desktop) ───────────────────── */}
       <header className="sticky top-0 z-50 w-full transition-all  backdrop-blur-md">
         <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-          {/* Responsive Header: Single row on lg+ screens, stacked on smaller screens */}
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-3 lg:gap-4">
-            {/* Logo */}
+          {/* Responsive Header: Single row on md+ screens, stacked on smaller screens */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 w-full">
+            {/* Logo - on left */}
             <div className="flex items-center gap-2 select-none shrink-0">
               <img src="/logo.svg" alt="Murugan AI" className="h-6 sm:h-7 md:h-8 lg:h-9 w-auto object-contain" />
             </div>
 
-            {/* Navigation Bar with Search icon wrapper */}
-            <div className="flex items-center gap-1 lg:flex-1 lg:justify-center">
-              <nav className="flex items-center gap-0.5 sm:gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm w-full lg:flex-1 lg:justify-center">
+            {/* Navigation Bar with Search icon and Profile - grouped on right for small screens */}
+            <div className="flex items-center gap-2 md:gap-3 lg:flex-1 lg:justify-center">
+              <nav className="flex items-center gap-0.5 sm:gap-1 bg-white p-1 rounded-full border border-slate-200/80 shadow-sm max-w-fit">
                 {["Dashboard", "Applications", "DUT", "Configuration"].map((item) => (
                   <button
                     key={item}
@@ -151,10 +151,10 @@ export function App() {
                   </button>
                 ))}
                 {/* Search icon - only visible on small screens, merged with navbar */}
-                <div className="lg:hidden h-4 w-px bg-slate-200 mx-0.5 sm:mx-1 shrink-0" />
+                <div className="md:hidden h-4 w-px bg-slate-200 mx-0.5 sm:mx-1 shrink-0" />
                 <button
                   title="Search"
-                  className="lg:hidden p-1.5 sm:p-2 md:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
+                  className="md:hidden p-1.5 sm:p-2 md:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0 flex items-center justify-center"
                 >
                   <img src="/SearchIcon.svg" alt="Search" className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 object-contain" />
                 </button>
@@ -163,16 +163,16 @@ export function App() {
               {/* Search icon - only visible on wide screens, separate from navbar */}
               <button
                 title="Search"
-                className="hidden lg:flex rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all items-center justify-center cursor-pointer shrink-0 h-[52px] w-[52px]"
+                className="hidden md:flex rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 transition-all items-center justify-center cursor-pointer shrink-0 h-[52px] w-[52px]"
               >
                 <img src="/SearchIcon.svg" alt="Search" className="w-5 h-5 object-contain" />
               </button>
-            </div>
 
-            {/* Profile Avatar */}
-            <div className="flex items-center shrink-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
-                <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+              {/* Profile Avatar - grouped with navbar on small screens, separate on large */}
+              <div className="flex items-center shrink-0">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full overflow-hidden border border-slate-200/80 shadow-sm bg-white flex items-center justify-center p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
+                  <img src={profileImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                </div>
               </div>
             </div>
           </div>
@@ -185,7 +185,7 @@ export function App() {
         {/* Welcome row */}
         <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-3">
           <h1 className="text-xl sm:text-2xl md:text-[28px] font-light tracking-tight sm:pl-2 md:pl-4 bg-gradient-to-r from-black via-[#001D6E] to-[#004FEC] bg-clip-text text-transparent">
-            Good morning Admin
+            Good morning , Selva!
           </h1>
           <div className="flex items-center gap-1 bg-white/60 backdrop-blur-xl border border-white/80 rounded-full p-1 shadow-sm overflow-x-auto max-w-full mx-auto sm:mx-0">
             {["This Week", "This Month", "Custom"].map((t) => (
